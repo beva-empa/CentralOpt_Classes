@@ -1,0 +1,42 @@
+CapTech 1 1 0.0
+CapTech 1 2 350.0
+CapTech 1 3 0.0
+CapTech 1 4 240.41780848367148
+CapTech 1 5 799.0614576721672
+CapTech 1 6 350.0
+CapTech 1 7 0.0
+CapTech 1 8 3806.9994586175267
+CapTech 1 9 57.60064965896774
+CapTech 1 10 1000000.0
+CapTech 2 1 0.0
+CapTech 2 2 50.0
+CapTech 2 3 0.0
+CapTech 2 4 0.0
+CapTech 2 5 0.0
+CapTech 2 6 0.0
+CapTech 2 7 350.0
+CapTech 2 8 1431.436938678481
+CapTech 2 9 0.0
+CapTech 2 10 1000000.0
+CapTech 3 1 0.0
+CapTech 3 2 0.0
+CapTech 3 3 0.0
+CapTech 3 4 0.0
+CapTech 3 5 0.0
+CapTech 3 6 50.0
+CapTech 3 7 0.0
+CapTech 3 8 174.2134127720546
+CapTech 3 9 0.0
+CapTech 3 10 1000000.0
+CapStg 1 1 1 0.0
+CapStg 1 1 2 14338.226905122963
+CapStg 1 2 1 841.5986848650754
+CapStg 1 2 2 0.0
+CapStg 2 1 1 0.0
+CapStg 2 1 2 1.796066073797342
+CapStg 2 2 1 0.0
+CapStg 2 2 2 0.0
+CapStg 3 1 1 0.0
+CapStg 3 1 2 0.0
+CapStg 3 2 1 0.0
+CapStg 3 2 2 0.0
