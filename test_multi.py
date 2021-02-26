@@ -324,6 +324,7 @@ def saveCost(workbook, tech_cost_final, storage_cost_final, final_cost_final, gr
 
 
 def saveStorage(workbook, storage_heat_final, storage_elec_final, battery_depth_final, SOC_elec, SOC_therm,
+                storage_elecin_final, storage_elecout_final, storage_heatin_final, storage_heatout_final,
                 list_storage, date_info, time_info, num_hubs):
 
     worksheet = workbook.add_worksheet('final storage')
@@ -333,12 +334,14 @@ def saveStorage(workbook, storage_heat_final, storage_elec_final, battery_depth_
 
     for i in range(num_hubs):
         if 'heat_storage' in list_storage[i]:
-            header.extend(['thermal level - hub '+str(i+1), 'thermal SOC - hub '+str(i+1)])
+            header.extend(['thermal level - hub '+str(i+1), 'thermal SOC - hub '+str(i+1),
+                           'thermal inp - hub '+str(i+1), 'thermal out - hub '+str(i+1)])
 
         if 'Battery' in list_storage[i]:
             header.extend(
-                ['Battery level - hub '+str(i+1), 'Battery SOC - hub '+str(i+1), 'Batt 0-20% - hub '+str(i+1),
-                 'Batt 20-40% - hub '+str(i+1), 'Batt 40-60% - hub '+str(i+1), 'Batt 60-80% - hub '+str(i+1)])
+                ['Battery level - hub '+str(i+1), 'Battery SOC - hub '+str(i+1), 'Battery inp - hub '+str(i+1),
+                 'Battery out - hub '+ str(i+1), 'Batt 0-20% - hub '+str(i+1), 'Batt 20-40% - hub '+str(i+1),
+                 'Batt 40-60% - hub '+str(i+1), 'Batt 60-80% - hub '+str(i+1)])
 
     header = [header]
 
@@ -356,10 +359,14 @@ def saveStorage(workbook, storage_heat_final, storage_elec_final, battery_depth_
             if 'heat_storage' in list_storage[j]:
                 xl_data.extend([storage_heat_final[i][j]])
                 xl_data.extend([SOC_therm[i][j]])
+                xl_data.extend([storage_heatin_final[i][j]])
+                xl_data.extend([storage_heatout_final[i][j]])
 
             if 'Battery' in list_storage[j]:
                 xl_data.extend([storage_elec_final[i][j]])
                 xl_data.extend([SOC_elec[i][j]])
+                xl_data.extend([storage_elecin_final[i][j]])
+                xl_data.extend([storage_elecout_final[i][j]])
                 xl_data.extend(battery_depth_final[i][j])
 
         xl_final.append(xl_data)

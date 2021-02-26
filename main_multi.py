@@ -17,6 +17,7 @@ import sys
 import logging
 from comp_classes import *
 from test_multi import *
+# from visualize_results import *
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -32,6 +33,7 @@ num_opt_var = 24
 UPmin_CHP = 12
 DNmin_CHP = 2
 
+trans_cost = 0.01
 P_delta = 0.1
 Q_delta = 0.1
 num_hubs = 3
@@ -50,7 +52,7 @@ min_cap_CHP = 0.42
 solar_area = 25700
 
 time_start = dt.datetime(2018, 3, 1, 0, 0, 0)
-time_end = dt.datetime(2018, 3, 3, 0, 0, 0)
+time_end = dt.datetime(2018, 3, 4, 0, 0, 0)
 time_now = time_start
 start_time = dt.datetime(2018, 1, 1)
 
@@ -95,6 +97,7 @@ if __name__ == '__main__':
             for t in range(num_opt_var):
                 constr += [item.P_strt[t] >= 0, item.Q_strt[t] >= 0]
                 constr += [item.P_strt[t] <= Pmax]
+                cost += item.P_strt[t] * trans_cost + item.Q_strt[t] * trans_cost
 
         for hub in range(1, num_hubs + 1):
 
@@ -498,7 +501,7 @@ if __name__ == '__main__':
                                    comp_list[it].P_BatteryCh[t] <= BigM * comp_list[it].b_BatteryCh[t],
                                    comp_list[it].P_BatteryDc[t] >= 0,
                                    comp_list[it].P_BatteryDc[t] <= BigM * comp_list[it].b_BatteryDc[t],
-                                   comp_list[it].b_BatteryCh[t] + comp_list[it].b_BatteryDc[t] == 1,
+                                   comp_list[it].b_BatteryCh[t] + comp_list[it].b_BatteryDc[t] <= 1,
                                    comp_list[it].w1_Battery[t] <= 0.2, comp_list[it].w2_Battery[t] <= 0.2,
                                    comp_list[it].w3_Battery[t] <= 0.2, comp_list[it].w4_Battery[t] <= 0.2,
                                    comp_list[it].w1_Battery[t] >= 0, comp_list[it].w2_Battery[t] >= 0,
@@ -562,6 +565,7 @@ if __name__ == '__main__':
                 if tran_list[idx].origin == hub:
                     power_list.append(-tran_list[idx].P_strt)
                     heat_list.append(-tran_list[idx].Q_strt)
+
                 elif tran_list[idx].recpnt == hub:
                     power_list.append(tran_list[idx].P_strt)
                     heat_list.append(tran_list[idx].Q_strt)
@@ -613,7 +617,8 @@ if __name__ == '__main__':
             demand_power.append(P_Demand[0])
             demand_heat.append(Q_Demand[0])
 
-            # Solve with mosek or Gurobi
+
+        # Solve with mosek or Gurobi
         problem = cp.Problem(cp.Minimize(cost), constr)
         problem.solve(solver=cp.MOSEK, verbose=True, save_file='opt_diagnosis.opf',
                       mosek_params={mosek.iparam.intpnt_solve_form: mosek.solveform.dual,
@@ -689,8 +694,8 @@ if __name__ == '__main__':
                     ht.append(comp_list[it].Q_CHP.value[0])
                     t_cost += comp_list[it].C_CHP.value[0]
 
-                    C_on.append(comp_list[it].R_CHP.value[0])
-                    C_off.append(comp_list[it].D_CHP.value[0])
+                    C_on.append(round(comp_list[it].R_CHP.value[0]))
+                    C_off.append(round(comp_list[it].D_CHP.value[0]))
                     f_cost += comp_list[it].C_CHP.value[0]
                     it = it + 1
 
@@ -911,12 +916,6 @@ if __name__ == '__main__':
                                                                       capacities_stor, tech_details, storage_details,
                                                                       network_cap, list_techs, list_storage, time_now)
 
-        elec_storage = storage_elec
-        battery_depth = batt_depth
-        thermal_storage = storage_heat
-        CHP_Runtime = CHP_ontime
-        CHP_Downtime = CHP_offtime
-
         demand_power_final.append(demand_power)
         demand_heat_final.append(demand_heat)
         power_final.append(power)
@@ -946,6 +945,8 @@ if __name__ == '__main__':
         SOC_e = []
         SOC_th = []
 
+
+
         for hub in range(0, num_hubs):
             if Battery_max[hub] > 0:
                 temp = storage_elec[hub] * 100 / Battery_max[hub]
@@ -968,9 +969,15 @@ if __name__ == '__main__':
         time_info.append([str2])
         print("wait")
 
+        elec_storage = storage_elec
+        battery_depth = batt_depth
+        thermal_storage = storage_heat
+        CHP_Runtime = CHP_ontime
+        CHP_Downtime = CHP_offtime
+
     comp_end = time.perf_counter()
 
-    with xlsxwriter.Workbook('results.xlsx') as workbook:
+    with xlsxwriter.Workbook('results_trcost.xlsx') as workbook:
 
         savePower(workbook, demand_power_final, power_final, grid_in_final, grid_out_final, storage_elecin_final,
                   storage_elecout_final, elec_net_final, list_techs, list_storage, date_info, time_info, num_hubs)
@@ -982,6 +989,7 @@ if __name__ == '__main__':
                  num_hubs)
 
         saveStorage(workbook, storage_heat_final, storage_elec_final, battery_depth_final, SOC_elec, SOC_therm,
+                    storage_elecin_final, storage_elecout_final, storage_heatin_final, storage_heatout_final,
                     list_storage, date_info, time_info, num_hubs)
 
         saveChp(workbook, CHP_ontime_final, CHP_offtime_final, list_techs, date_info, time_info, num_hubs)
